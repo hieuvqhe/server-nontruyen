@@ -348,16 +348,27 @@ ApiRouter.post("/login", async (req, res) => {
       return res.status(401).send({ message: "Invalid password" });
     }
 
-    const token = jwt.sign(
+    // Generate access token (short-lived)
+    const access_token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "1h", // 1 hour
+      }
+    );
+
+    // Generate refresh token (long-lived)
+    const refresh_token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET,
+      {
+        expiresIn: "7d", // 7 days
       }
     );
 
     res.status(200).send({
-      token,
+      access_token,
+      refresh_token,
       user: {
         id: user._id,
         email: user.email,
