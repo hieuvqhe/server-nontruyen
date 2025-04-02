@@ -41,10 +41,9 @@ app.use(async (err, req, res, next) => {
 })
 
 const HOST_NAME = process.env.HOST_NAME;
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 9999;
 
-app.listen(PORT, HOST_NAME, () => {
-    console.log(`Server running at: http://${HOST_NAME}:${PORT}`);
-    //Connect database 
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
     connectDB();
 });
