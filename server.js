@@ -3,7 +3,8 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const httpErrors = require("http-errors");
 require("dotenv").config();
-
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const connectDB = require ("./dbConnect/db");
 const db = require("./models");
 const ApiRouter = require("./routes/api.route");
@@ -13,7 +14,8 @@ const app = express();
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.get("/", async (req, res, next) => {
     res.status(200).send({ message: "Welcome to Restful API server" });
