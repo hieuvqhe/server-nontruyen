@@ -15,13 +15,37 @@ ComicRoute.get("/protected", verifyToken, (req, res) => {
 // Lấy tất cả truyện đang đọc dở của user
 ComicRoute.get("/reading-list", verifyToken, async (req, res) => {
   try {
+    // Lấy tham số phân trang từ query
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const validPage = page > 0 ? page : 1;
+    const validLimit = limit > 0 ? limit : 10;
+    const skip = (validPage - 1) * validLimit;
+
+    // Đếm tổng số item
+    const totalItems = await db.ComicReading.countDocuments({ 
+      userId: req.userId 
+    });
+
+    // Lấy dữ liệu phân trang
     const readingList = await db.ComicReading.find({ userId: req.userId })
       .sort({ lastReadAt: -1 })
+      .skip(skip)
+      .limit(validLimit)
       .select("slug lastReadChapter lastReadAt");
+
+    // Tính toán thông tin phân trang
+    const totalPages = Math.ceil(totalItems / validLimit);
 
     res.status(200).json({
       message: "Successfully fetched reading list",
-      data: readingList
+      data: readingList,
+      pagination: {
+        currentPage: validPage,
+        totalPages,
+        totalItems,
+        itemsPerPage: validLimit
+      }
     });
     
   } catch (error) {
