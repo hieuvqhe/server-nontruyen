@@ -88,7 +88,8 @@ const sendVerificationEmail = async (email, _id) => {
     if (
       !process.env.AUTH_EMAIL ||
       !process.env.AUTH_PASS ||
-      !process.env.BASE_URL
+      !process.env.BASE_URL ||
+      !process.env.BASE_URL_API
     ) {
       throw new Error("Missing environment variables for email configuration");
     }
@@ -165,7 +166,7 @@ const sendVerificationEmail = async (email, _id) => {
                     Cảm ơn bạn đã đăng ký tài khoản. Hãy click nút bên dưới để hoàn tất xác thực email:
                 </p>
 
-                <a href="${process.env.BASE_URL}/api/verify/${uniqueString}" class="verify-btn">
+                <a href="${process.env.BASE_URL_API}/api/verify/${uniqueString}" class="verify-btn">
                     XÁC THỰC NGAY
                 </a>
 
@@ -259,9 +260,7 @@ ApiRouter.get("/verify/:uniqueString", async (req, res) => {
     // Delete the verification record
     await UserVerification.deleteOne({ _id: verificationRecord._id });
 
-    res.status(200).send({
-      message: "Email verified successfully! You can now login.",
-    });
+    res.redirect('https://non-truyen.vercel.app/');
   } catch (error) {
     console.error("Verification error:", error);
     res.status(500).send({
@@ -496,7 +495,7 @@ ApiRouter.post("/forgot-password", async (req, res) => {
                     <br>Nếu bạn không yêu cầu đặt lại mật khẩu này, vui lòng liên hệ hỗ trợ ngay lập tức.
                 </p>
                 
-                <a href="${process.env.BASE_URL}/login" class="login-btn">
+                <a href="${process.env.BASE_URL_API}/login" class="login-btn">
                     ĐĂNG NHẬP NGAY
                 </a>
             </div>
